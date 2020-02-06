@@ -1,0 +1,89 @@
+# vcgencmd completion                                      -*- shell-script -*-
+
+# Lists the available arguments for commands
+# Based on https://www.raspberrypi.org/documentation/raspbian/applications/vcgencmd.md
+# Since there is no way to query a command for a list of arguments then
+# Everything listed here is hardcoded
+_vcgencmd_arglist()
+{
+	local args_vcos_ args_measure_clock_ args_measure_volts_ args_get_mem_ args_codec_enabled_ args_display_power_ args_display_power_displays_ args_get_config_
+	local pword_ cword_ command_ nwords_
+
+	args_vcos_="version log"
+	args_vcos_log_="status"
+	args_measure_clock_="arm core h264 isp v3d uart pwm emmc pixel vec hdmi dpi"
+	args_measure_volts_="core sdram_c sdram_i sdram_p"
+	args_get_mem_="arm gpu"
+	args_codec_enabled_="AGIF FLAC H263 H264 MJPA MJPB MJPG MPG2 MPG4 MVC0 PCM THRA VORB VP6 VP8 WMV9 WVC1"
+	args_display_power_="0 1 -1"
+	args_display_power_displays_="0 1 2 3 7"
+	args_get_config_="int str arm_freq audio_pwm_mode config_hdmi_boost disable_commandline_tags disable_l2cache display_hdmi_rotate display_lcd_rotate enable_gic force_eeprom_read force_pwm_open framebuffer_ignore_alpha framebuffer_swap gpu_freq gpu_freq_min hdmi_blanking init_uart_clock lcd_framerate mask_gpu_interrupt0 mask_gpu_interrupt1 max_framebuffers over_voltage over_voltage_avs pause_burst_frames program_serial_random total_mem hdmi_force_cec_address:0 hdmi_force_cec_address:1 hdmi_pixel_freq_limit:0 hdmi_pixel_freq_limit:1 device_tree overlay_prefix hdmi_cvt:0 hdmi_cvt:1 hdmi_edid_filename:0 hdmi_edid_filename:1 hdmi_timings:0 hdmi_timings:1"
+
+	cword_=${COMP_WORDS[COMP_CWORD]}
+	pword_=${COMP_WORDS[COMP_CWORD-1]}
+	command_=${COMP_WORDS[1]}
+	nwords_=${#COMP_WORDS[@]}
+	COMPREPLY=()
+
+	if (( nwords_ < 4 )); then
+		case "$command_" in
+			"vcos")
+				COMPREPLY=($(compgen -W "$args_vcos_" "$cword_"))
+				;;
+			"measure_clock")
+				COMPREPLY=($(compgen -W "$args_measure_clock_" "$cword_"))
+				;;
+			"measure_volts")
+				COMPREPLY=($(compgen -W "$args_measure_volts_" "$cword_"))
+				;;
+			"get_mem")
+				COMPREPLY=($(compgen -W "$args_get_mem_" "$cword_"))
+				;;
+			"codec_enabled")
+				COMPREPLY=($(compgen -W "$args_codec_enabled_" "$cword_"))
+				;;
+			"display_power")
+				COMPREPLY=($(compgen -W "$args_display_power_" "$cword_"))
+				;;
+			"get_config")
+				COMPREPLY=($(compgen -W "$args_get_config_" "$cword_"))
+				;;
+		esac
+	elif (( nwords_ < 5 )); then
+		case "$command_" in
+			"vcos")
+				if [ $pword_ == "log" ]; then
+					COMPREPLY=($(compgen -W "$args_vcos_log_" "$cword_"))
+				fi
+				;;
+			"display_power")
+				COMPREPLY=($(compgen -W "$args_display_power_displays_" "$cword_"))
+				;;
+		esac
+	fi
+}
+
+_vcgencmd_commands()
+{
+	local commands_
+
+	if [[ `vcgencmd commands` =~ \"(.+)\" ]]; then
+	   commands_=${BASH_REMATCH[1]}
+	fi
+	commands_=${commands_//,}
+
+	COMPREPLY=($(compgen -W "$commands_" "${COMP_WORDS[1]}"))
+}
+
+_vcgencmd()
+{
+	if [ "${#COMP_WORDS[@]}" == "2" ]; then
+		_vcgencmd_commands
+	else
+		_vcgencmd_arglist
+	fi
+
+}  
+complete -F _vcgencmd vcgencmd
+
+# ex: filetype=sh
