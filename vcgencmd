@@ -17,7 +17,9 @@ _vcgencmd_arglist()
 	args_codec_enabled_="AGIF FLAC H263 H264 MJPA MJPB MJPG MPG2 MPG4 MVC0 PCM THRA VORB VP6 VP8 WMV9 WVC1"
 	args_display_power_="0 1 -1"
 	args_display_power_displays_="0 1 2 3 7"
-	args_get_config_="int str arm_freq audio_pwm_mode config_hdmi_boost disable_commandline_tags disable_l2cache display_hdmi_rotate display_lcd_rotate enable_gic force_eeprom_read force_pwm_open framebuffer_ignore_alpha framebuffer_swap gpu_freq gpu_freq_min hdmi_blanking init_uart_clock lcd_framerate mask_gpu_interrupt0 mask_gpu_interrupt1 max_framebuffers over_voltage over_voltage_avs pause_burst_frames program_serial_random total_mem hdmi_force_cec_address:0 hdmi_force_cec_address:1 hdmi_pixel_freq_limit:0 hdmi_pixel_freq_limit:1 device_tree overlay_prefix hdmi_cvt:0 hdmi_cvt:1 hdmi_edid_filename:0 hdmi_edid_filename:1 hdmi_timings:0 hdmi_timings:1"
+	args_get_config_="int str"
+	args_get_config_+=" $(vcgencmd get_config int | awk -F "=" '{ print $1 }')"
+	args_get_config_+=" $(vcgencmd get_config str | awk -F "=" '{ print $1 }')"
 
 	cword_=${COMP_WORDS[COMP_CWORD]}
 	pword_=${COMP_WORDS[COMP_CWORD-1]}
